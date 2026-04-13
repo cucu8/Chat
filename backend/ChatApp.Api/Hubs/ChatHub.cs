@@ -7,11 +7,13 @@ public class ChatHub : Hub
 {
 
     private readonly IMessageService _messageService;
+    private readonly IAuthService _authService;
     private static readonly Dictionary<string, string> _connections = new();
 
-    public ChatHub(IMessageService messageService)
+    public ChatHub(IMessageService messageService, IAuthService authService)
     {
         _messageService = messageService;
+        _authService = authService;
     }
 
     // kullanıcı bağlandığında
@@ -40,6 +42,17 @@ public class ChatHub : Hub
     {
         await _messageService.SaveMessage(senderId, receiverId, message);
 
+        // Gönderen kullanıcının ismini bulalım
+        string senderName = "Bilinmeyen";
+        if (Guid.TryParse(senderId, out var senderGuid))
+        {
+            var sender = await _authService.GetUserById(senderGuid);
+            if (sender != null)
+            {
+                senderName = sender.Username;
+            }
+        }
+
         // 🔥 receiver'ın connectionId'sini bul
         var connectionId = _connections
             .FirstOrDefault(x => x.Value == receiverId).Key;
@@ -48,7 +61,7 @@ public class ChatHub : Hub
         if (!string.IsNullOrEmpty(connectionId))
         {
             await Clients.Client(connectionId)
-                .SendAsync("ReceiveMessage", senderId, message);
+                .SendAsync("ReceiveMessage", senderName, message);
         }
     }
 }

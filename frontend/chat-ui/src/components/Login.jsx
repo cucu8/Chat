@@ -8,17 +8,14 @@ function Login({ onLoginSuccess, onSwitchToRegister }) {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      // Backend expects username and password as query parameters
       const response = await fetch(`http://localhost:5236/api/Auth/login?username=${username}&password=${password}`, {
         method: "POST"
       });
 
       if (response.ok) {
         const data = await response.json();
-        // data contains: token, Id, Username
         localStorage.setItem("chat_token", data.token);
-        localStorage.setItem("chat_user", JSON.stringify({ id: data.id, username: data.username }));
-        
+        localStorage.setItem("chat_user", JSON.stringify({ id: data.id || data.Id, username: data.username || data.Username }));
         onLoginSuccess(data);
       } else {
         const error = await response.text();
@@ -30,14 +27,14 @@ function Login({ onLoginSuccess, onSwitchToRegister }) {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4">
-      <div className="bg-white p-6 rounded shadow-md w-full max-w-sm">
-        <h2 className="text-2xl font-bold mb-4 text-center">Giriş Yap</h2>
-        <form onSubmit={handleLogin} className="space-y-4">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
+      <div className="bg-white p-8 rounded-lg border-4 border-gray-400 shadow-2xl w-full max-w-sm text-center">
+        <h2 className="text-3xl font-black mb-6 text-gray-800 border-b-4 border-gray-100 pb-2">GİRİŞ YAP</h2>
+        <form onSubmit={handleLogin} className="flex flex-col space-y-5">
           <input
             type="text"
             placeholder="Kullanıcı Adı"
-            className="w-full border p-2 rounded"
+            className="border-4 border-gray-300 p-3 rounded bg-white font-bold focus:border-blue-500 outline-none"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             required
@@ -45,21 +42,24 @@ function Login({ onLoginSuccess, onSwitchToRegister }) {
           <input
             type="password"
             placeholder="Şifre"
-            className="w-full border p-2 rounded"
+            className="border-4 border-gray-300 p-3 rounded bg-white font-bold focus:border-blue-500 outline-none"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
           />
-          <button type="submit" className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600">
-            Giriş Yap
+          <button
+            type="submit"
+            className="bg-blue-600 text-white font-black py-4 px-6 rounded-lg shadow-xl hover:bg-blue-800 transition-all text-xl active:scale-95"
+          >
+            OTURUM AÇ
           </button>
         </form>
-        {message && <p className="mt-4 text-center text-sm text-red-500">{message}</p>}
+        {message && <p className="mt-4 text-red-600 font-black bg-red-50 p-2 border-2 border-red-200 rounded">{message}</p>}
         <button
           onClick={onSwitchToRegister}
-          className="mt-4 w-full text-blue-500 text-sm hover:underline"
+          className="mt-8 text-blue-700 hover:text-blue-900 font-black underline uppercase text-sm"
         >
-          Hesabın yok mu? Kayıt Ol
+          Kayıt Ol (Üye Değil misin?)
         </button>
       </div>
     </div>

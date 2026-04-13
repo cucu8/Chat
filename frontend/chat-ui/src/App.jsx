@@ -45,10 +45,10 @@ function App() {
         .start()
         .then(() => {
           console.log("Connected to SignalR");
-          connection.on("ReceiveMessage", (senderId, message) => {
+          connection.on("ReceiveMessage", (senderName, message) => {
             setMessages((prev) => [
               ...prev,
-              { senderId, content: message },
+              { senderName, content: message },
             ]);
           });
         })
@@ -64,7 +64,7 @@ function App() {
 
       setMessages((prev) => [
         ...prev,
-        { senderId: user.id, content: message }
+        { senderName: "Sen", content: message }
       ]);
 
       setMessage("");
@@ -83,71 +83,91 @@ function App() {
   };
 
   if (view === "login") {
-    return <Login 
-      onLoginSuccess={(data) => {
-        setToken(data.token);
-        // Note: Backend returns 'id' not 'Id' sometimes depending on JSON serialization
-        setUser({ id: data.id || data.Id, username: data.username || data.Username });
-        setView("chat");
-      }} 
-      onSwitchToRegister={() => setView("register")} 
-    />;
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-200">
+        <Login 
+          onLoginSuccess={(data) => {
+            setToken(data.token);
+            setUser({ id: data.id || data.Id, username: data.username || data.Username });
+            setView("chat");
+          }} 
+          onSwitchToRegister={() => setView("register")} 
+        />
+      </div>
+    );
   }
 
   if (view === "register") {
-    return <Register onSwitchToLogin={() => setView("login")} />;
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-200">
+        <Register onSwitchToLogin={() => setView("login")} />
+      </div>
+    );
   }
 
   return (
-    <div className="p-6 max-w-2xl mx-auto bg-white min-h-screen">
-      <div className="flex justify-between items-center mb-6 border-b pb-4">
-        <h2 className="text-2xl font-bold">Chat App</h2>
-        <div className="flex items-center gap-4">
-          <span className="text-gray-600">Hoş geldin, <b>{user?.username}</b></span>
-          <button 
-            onClick={handleLogout}
-            className="text-red-500 hover:underline text-sm"
-          >
-            Çıkış Yap
-          </button>
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-200 p-6">
+      <div className="w-full max-w-2xl bg-white rounded-xl border-4 border-gray-400 shadow-2xl overflow-hidden">
+        <div className="flex justify-between items-center p-6 bg-gray-300 border-b-4 border-gray-400 shadow-inner">
+          <h2 className="text-2xl font-black uppercase tracking-tighter">CHAT APP</h2>
+          <div className="flex items-center gap-4">
+            <span className="text-sm font-black uppercase tracking-tight">Kullanıcı: <b className="text-blue-800 underline decoration-2">{user?.username}</b></span>
+            <button 
+              onClick={handleLogout}
+              className="px-4 py-2 bg-red-600 text-white font-black rounded-lg shadow-lg hover:bg-red-800 transition-all text-xs border-2 border-red-900 active:scale-95"
+            >
+              ÇIKIŞ
+            </button>
+          </div>
         </div>
-      </div>
 
-      <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700 mb-1">Alıcı ID:</label>
-        <input
-          placeholder="ReceiverId (Göndermek istediğiniz kişinin ID'si)"
-          className="w-full border p-2 rounded"
-          value={receiverId}
-          onChange={(e) => setReceiverId(e.target.value)}
-        />
-      </div>
+        <div className="p-8 space-y-6">
+          <div className="flex flex-col bg-gray-50 p-4 border-2 border-gray-100 rounded-lg shadow-inner">
+            <label className="text-xs font-black mb-2 uppercase tracking-widest text-gray-400">Mesaj Gönderilecek Kullanıcı ID</label>
+            <input
+              placeholder="Alıcı ID Girin..."
+              className="border-4 border-gray-300 p-3 rounded bg-white font-black focus:border-blue-500 outline-none placeholder:font-normal placeholder:italic"
+              value={receiverId}
+              onChange={(e) => setReceiverId(e.target.value)}
+            />
+          </div>
 
-      <div className="flex gap-2 mb-6">
-        <input
-          placeholder="Mesaj yaz..."
-          className="flex-1 border p-2 rounded"
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
-        />
-        <button 
-          onClick={sendMessage}
-          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-        >
-          Gönder
-        </button>
-      </div>
+          <div className="flex gap-3">
+            <input
+              placeholder="Mesajınızı buraya yazın..."
+              className="flex-1 border-4 border-gray-300 p-4 rounded-lg bg-white font-bold focus:border-blue-500 outline-none shadow-md"
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
+            />
+            <button 
+              onClick={sendMessage}
+              className="bg-blue-700 text-white px-10 py-4 rounded-lg font-black shadow-2xl hover:bg-blue-900 transition-all active:scale-95 border-b-8 border-blue-900 text-xl"
+            >
+              GÖNDER
+            </button>
+          </div>
 
-      <div className="border rounded p-4 bg-gray-50 h-[400px] overflow-y-auto">
-        <h3 className="font-bold mb-2 border-b pb-1">Mesajlar</h3>
-        <div className="space-y-2">
-          {messages.map((msg, index) => (
-            <div key={index} className={`p-2 rounded ${msg.senderId === user.id ? "bg-blue-100 ml-auto max-w-[80%]" : "bg-gray-200 mr-auto max-w-[80%]"}`}>
-              <b className="text-xs block text-gray-500">{msg.senderId === user.id ? "Sen" : `Gönderen: ${msg.senderId}`}</b>
-              <span>{msg.content}</span>
+          <div className="border-4 border-gray-200 rounded-xl bg-gray-50 shadow-inner">
+            <h3 className="bg-gray-200 p-3 font-black text-gray-700 border-b-4 border-gray-300 text-center uppercase tracking-widest text-sm">Mesaj Kayıtları</h3>
+            <div className="p-6 h-[350px] overflow-y-auto space-y-4 bg-white/50 backdrop-blur-sm">
+              {messages.length === 0 ? (
+                <div className="flex flex-col items-center justify-center h-full opacity-20">
+                  <span className="text-4xl mb-2">💬</span>
+                  <p className="font-black italic uppercase">Henüz Mesajlaşma Yok</p>
+                </div>
+              ) : (
+                messages.map((msg, index) => (
+                  <div key={index} className={`flex ${msg.senderName === "Sen" ? "justify-end" : "justify-start"}`}>
+                    <div className={`p-4 rounded-2xl border-4 shadow-xl max-w-[85%] ${msg.senderName === "Sen" ? "bg-blue-600 border-blue-800 text-white rounded-br-none" : "bg-gray-100 border-gray-300 text-black rounded-bl-none font-bold"}`}>
+                      <b className="text-[10px] block border-b-2 border-white/20 mb-2 uppercase italic tracking-widest">{msg.senderName === "Sen" ? "SİZDEN GELEN" : `GÖNDEREN: ${msg.senderName}`}</b>
+                      <span className="text-base leading-snug">{msg.content}</span>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
-          ))}
+          </div>
         </div>
       </div>
     </div>

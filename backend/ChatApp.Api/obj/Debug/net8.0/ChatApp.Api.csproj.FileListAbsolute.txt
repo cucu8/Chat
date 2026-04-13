@@ -122,3 +122,4 @@
 /Users/cuneytdonmez/Desktop/Projects/Chat/backend/ChatApp.Api/bin/Debug/net8.0/Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
 /Users/cuneytdonmez/Desktop/Projects/Chat/backend/ChatApp.Api/bin/Debug/net8.0/Microsoft.IdentityModel.Tokens.dll
 /Users/cuneytdonmez/Desktop/Projects/Chat/backend/ChatApp.Api/bin/Debug/net8.0/System.IdentityModel.Tokens.Jwt.dll
+/Users/cuneytdonmez/Desktop/Projects/Chat/backend/ChatApp.Api/obj/Debug/net8.0/ChatApp.Api.sourcelink.json

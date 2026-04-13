@@ -42,6 +42,11 @@ public class AuthService : IAuthService
         return user;
     }
 
+    public async Task<User?> GetUserById(Guid id)
+    {
+        return await _context.Users.FindAsync(id);
+    }
+
     public string GenerateToken(User user)
     {
         var claims = new[]

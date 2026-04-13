@@ -8,7 +8,6 @@ function Register({ onSwitchToLogin }) {
   const handleRegister = async (e) => {
     e.preventDefault();
     try {
-      // Backend expects username and password as query parameters based on AuthController signature
       const response = await fetch(`http://localhost:5236/api/Auth/register?username=${username}&password=${password}`, {
         method: "POST"
       });
@@ -26,36 +25,39 @@ function Register({ onSwitchToLogin }) {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4">
-      <div className="bg-white p-6 rounded shadow-md w-full max-w-sm">
-        <h2 className="text-2xl font-bold mb-4 text-center">Kayıt Ol</h2>
-        <form onSubmit={handleRegister} className="space-y-4">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
+      <div className="bg-white p-8 rounded-lg border-4 border-gray-400 shadow-2xl w-full max-w-sm text-center">
+        <h2 className="text-3xl font-black mb-6 text-gray-800 border-b-4 border-gray-100 pb-2">KAYIT OL</h2>
+        <form onSubmit={handleRegister} className="flex flex-col space-y-5">
           <input
             type="text"
-            placeholder="Kullanıcı Adı"
-            className="w-full border p-2 rounded"
+            placeholder="Kullanıcı Adı Belirleyin"
+            className="border-4 border-gray-300 p-3 rounded bg-white font-bold focus:border-green-500 outline-none"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             required
           />
           <input
             type="password"
-            placeholder="Şifre"
-            className="w-full border p-2 rounded"
+            placeholder="Şifre Belirleyin"
+            className="border-4 border-gray-300 p-3 rounded bg-white font-bold focus:border-green-500 outline-none"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
           />
-          <button type="submit" className="w-full bg-green-500 text-white p-2 rounded hover:bg-green-600">
-            Kayıt Ol
+          <button
+            type="submit"
+            className="bg-green-600 text-white font-black py-4 px-6 rounded-lg shadow-xl hover:bg-green-800 transition-all text-xl active:scale-95"
+          >
+            HESAP OLUŞTUR
           </button>
         </form>
-        {message && <p className="mt-4 text-center text-sm text-gray-700">{message}</p>}
+        {message && <p className="mt-4 text-gray-700 font-black bg-green-50 p-2 border-2 border-green-200 rounded">{message}</p>}
         <button
           onClick={onSwitchToLogin}
-          className="mt-4 w-full text-blue-500 text-sm hover:underline"
+          className="mt-8 text-green-700 hover:text-green-900 font-black underline uppercase text-sm"
         >
-          Zaten hesabın var mı? Giriş Yap
+          Geri Dön (Giriş Yap)
         </button>
       </div>
     </div>

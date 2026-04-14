@@ -51,13 +51,13 @@ public class AuthService : IAuthService
     {
         var claims = new[]
         {
-        new Claim("userId", user.Id.ToString()),
-        new Claim(ClaimTypes.Name, user.Username)
-    };
+            new Claim("userId", user.Id.ToString()),
+            new Claim("username", user.Username)
+        };
 
         var key = new SymmetricSecurityKey(
        Encoding.UTF8.GetBytes(_configuration["Jwt:Key"])
-   );
+        );
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
         var token = new JwtSecurityToken(

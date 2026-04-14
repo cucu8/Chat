@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.SignalR;
 using ChatApp.Api.Interfaces;
+using StackExchange.Redis;
+using System.Security.Claims;
 
 namespace ChatApp.Api.Hubs;
 
@@ -8,23 +10,34 @@ public class ChatHub : Hub
 
     private readonly IMessageService _messageService;
     private readonly IAuthService _authService;
-    private static readonly Dictionary<string, string> _connections = new();
+    private readonly IConnectionMultiplexer _redis;
+    private readonly IDatabase _db;
 
-    public ChatHub(IMessageService messageService, IAuthService authService)
+    public ChatHub(IMessageService messageService, IAuthService authService, IConnectionMultiplexer redis)
     {
         _messageService = messageService;
         _authService = authService;
+        _redis = redis;
+        _db = _redis.GetDatabase();
     }
 
     // kullanıcı bağlandığında
     public override async Task OnConnectedAsync()
     {
-        var httpContext = Context.GetHttpContext();
-        var userId = httpContext.Request.Query["userId"];
+        var userId = Context.User?.FindFirst("userId")?.Value;
+        var username = Context.User?.FindFirst("username")?.Value;
 
-        _connections[Context.ConnectionId] = userId;
+        if (userId != null && username != null)
+        {
+            await _db.HashSetAsync($"user:{userId}",
+            new HashEntry[]
+            {
+                new("connectionId", Context.ConnectionId),
+                new("username", username)
+            });
+        }
 
-        Console.WriteLine($"Connected: {Context.ConnectionId} - User: {userId}");
+        Console.WriteLine("USER: " + username);
 
         await base.OnConnectedAsync();
     }
@@ -32,17 +45,24 @@ public class ChatHub : Hub
     // kullanıcı ayrıldığında
     public override async Task OnDisconnectedAsync(Exception? exception)
     {
-        _connections.Remove(Context.ConnectionId);
+        var userId = Context.User.FindFirst("userId")?.Value;
+
+        if (userId != null)
+        {
+            await _db.KeyDeleteAsync($"user:{userId}");
+        }
+
+        Console.WriteLine("CONNECTION_DISCONNECTED: " + userId);
+
 
         await base.OnDisconnectedAsync(exception);
     }
 
-    // mesaj gönderme
     public async Task SendMessage(string senderId, string receiverId, string message)
     {
         await _messageService.SaveMessage(senderId, receiverId, message);
 
-        // Gönderen kullanıcının ismini bulalım
+        // sender name
         string senderName = "Bilinmeyen";
         if (Guid.TryParse(senderId, out var senderGuid))
         {
@@ -53,14 +73,12 @@ public class ChatHub : Hub
             }
         }
 
-        // 🔥 receiver'ın connectionId'sini bul
-        var connectionId = _connections
-            .FirstOrDefault(x => x.Value == receiverId).Key;
+        // 🔥 RECEIVER connectionId al
+        var receiverConnectionId = await _db.HashGetAsync($"user:{receiverId}", "connectionId");
 
-        //ilgili connetctionID'ye yolla
-        if (!string.IsNullOrEmpty(connectionId))
+        if (!receiverConnectionId.IsNullOrEmpty)
         {
-            await Clients.Client(connectionId)
+            await Clients.Client(receiverConnectionId!)
                 .SendAsync("ReceiveMessage", senderName, message);
         }
     }

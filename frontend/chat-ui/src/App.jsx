@@ -28,7 +28,9 @@ function App() {
     if (!user?.id) return;
 
     const newConnection = new signalR.HubConnectionBuilder()
-      .withUrl(`http://localhost:5236/chatHub?userId=${user.id}`)
+      .withUrl("http://localhost:5236/chatHub", {
+        accessTokenFactory: () => token
+      })
       .withAutomaticReconnect()
       .build();
 
@@ -85,13 +87,13 @@ function App() {
   if (view === "login") {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-200">
-        <Login 
+        <Login
           onLoginSuccess={(data) => {
             setToken(data.token);
             setUser({ id: data.id || data.Id, username: data.username || data.Username });
             setView("chat");
-          }} 
-          onSwitchToRegister={() => setView("register")} 
+          }}
+          onSwitchToRegister={() => setView("register")}
         />
       </div>
     );
@@ -112,7 +114,7 @@ function App() {
           <h2 className="text-2xl font-black uppercase tracking-tighter">CHAT APP</h2>
           <div className="flex items-center gap-4">
             <span className="text-sm font-black uppercase tracking-tight">Kullanıcı: <b className="text-blue-800 underline decoration-2">{user?.username}</b></span>
-            <button 
+            <button
               onClick={handleLogout}
               className="px-4 py-2 bg-red-600 text-white font-black rounded-lg shadow-lg hover:bg-red-800 transition-all text-xs border-2 border-red-900 active:scale-95"
             >
@@ -140,7 +142,7 @@ function App() {
               onChange={(e) => setMessage(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
             />
-            <button 
+            <button
               onClick={sendMessage}
               className="bg-blue-700 text-white px-10 py-4 rounded-lg font-black shadow-2xl hover:bg-blue-900 transition-all active:scale-95 border-b-8 border-blue-900 text-xl"
             >

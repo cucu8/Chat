@@ -123,3 +123,6 @@
 /Users/cuneytdonmez/Desktop/Projects/Chat/backend/ChatApp.Api/bin/Debug/net8.0/Microsoft.IdentityModel.Tokens.dll
 /Users/cuneytdonmez/Desktop/Projects/Chat/backend/ChatApp.Api/bin/Debug/net8.0/System.IdentityModel.Tokens.Jwt.dll
 /Users/cuneytdonmez/Desktop/Projects/Chat/backend/ChatApp.Api/obj/Debug/net8.0/ChatApp.Api.sourcelink.json
+/Users/cuneytdonmez/Desktop/Projects/Chat/backend/ChatApp.Api/bin/Debug/net8.0/Pipelines.Sockets.Unofficial.dll
+/Users/cuneytdonmez/Desktop/Projects/Chat/backend/ChatApp.Api/bin/Debug/net8.0/StackExchange.Redis.dll
+/Users/cuneytdonmez/Desktop/Projects/Chat/backend/ChatApp.Api/bin/Debug/net8.0/System.IO.Hashing.dll
